@@ -580,7 +580,17 @@ static inline CC_HINT(nonnull) unlang_action_t pap_auth_pbkdf2_parse(rlm_rcode_t
 
 		RDEBUG("GOT iterations %zd %.*s", (q - p), (int) (q - p), p);
 
-		strlcpy(iterations_buff, (char const *)p, (q - p) + 1);
+		/*
+		 *      While passwords come from "trusted" sources, we don't trust them too much!
+		 */
+		if ((size_t) (q - p) >= sizeof(iterations_buff)) {
+			REMARKER((char const *) p, q - p,
+				 "Password.PBKDF2 iterations field is too large");
+			
+			goto finish;
+		}
+
+		memcpy(iterations_buff, (char const *)p, (q - p));
 
 		iterations = strtoul(iterations_buff, &qq, 10);
 		if (*qq != '\0') {
