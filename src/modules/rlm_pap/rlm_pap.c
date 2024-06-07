@@ -481,7 +481,7 @@ static inline CC_HINT(nonnull) unlang_action_t pap_auth_pbkdf2_parse(rlm_rcode_t
 	uint8_t			hash[EVP_MAX_MD_SIZE];
 	uint8_t			digest[EVP_MAX_MD_SIZE];
 
-	RDEBUG2("Comparing with \"known-good\" Password.PBKDF2");
+	RDEBUG2("Comparing with \"known-good\" Password.PBKDF2 %.*s", (int) len, str);
 
 	if (len <= 1) {
 		REDEBUG("Password.PBKDF2 is too short");
@@ -499,6 +499,8 @@ static inline CC_HINT(nonnull) unlang_action_t pap_auth_pbkdf2_parse(rlm_rcode_t
 		REDEBUG("Password.PBKDF2 has no component separators");
 		goto finish;
 	}
+
+	RDEBUG("Got component %.*s", (int) (q - p),  p);
 
 	digest_type = fr_table_value_by_substr(hash_names, (char const *)p, q - p, -1);
 	switch (digest_type) {
@@ -555,6 +557,7 @@ static inline CC_HINT(nonnull) unlang_action_t pap_auth_pbkdf2_parse(rlm_rcode_t
 	}
 
 	p = q + 1;
+	RDEBUG("Looking for iterations in %.*s", (int) (end - p), p);
 
 	if (((end - p) < 1) || !(q = memchr(p, iter_sep, end - p))) {
 		REDEBUG("Password.PBKDF2 missing iterations component");
@@ -570,8 +573,12 @@ static inline CC_HINT(nonnull) unlang_action_t pap_auth_pbkdf2_parse(rlm_rcode_t
 	 *	If it's not base64 encoded, assume it's ascii
 	 */
 	if (!iter_is_base64) {
-		char iterations_buff[sizeof("4294967295") + 1];
+		char iterations_buff[sizeof("4294967295") + 1] = {};
 		char *qq;
+
+		RDEBUG("Checking string %.*s in buffer %zd", (int) (end - p), p, sizeof(iterations_buff));
+
+		RDEBUG("GOT iterations %zd %.*s", (q - p), (int) (q - p), p);
 
 		strlcpy(iterations_buff, (char const *)p, (q - p) + 1);
 
