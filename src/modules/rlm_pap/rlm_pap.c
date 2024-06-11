@@ -481,7 +481,7 @@ static inline CC_HINT(nonnull) unlang_action_t pap_auth_pbkdf2_parse(rlm_rcode_t
 	uint8_t			hash[EVP_MAX_MD_SIZE];
 	uint8_t			digest[EVP_MAX_MD_SIZE];
 
-	RDEBUG2("Comparing with \"known-good\" Password.PBKDF2 %.*s", (int) len, str);
+	RDEBUG2("Comparing with \"known-good\" Password.PBKDF2 %zd %.*s", len, (int) len, str);
 
 	if (len <= 1) {
 		REDEBUG("Password.PBKDF2 is too short");
