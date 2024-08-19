@@ -7,8 +7,7 @@
 #  functionality from earlier tests.
 #
 FILES  := rfc.txt errors.txt extended.txt lucent.txt wimax.txt \
-	escape.txt condition.txt xlat.txt vendor.txt dhcp.txt ascend.txt \
-	rfc4849.txt eapol_key_msg.txt
+	eapol_key_msg.txt
 
 #
 #  Create the output directory

@@ -28,7 +28,7 @@ RCSID("$Id$")
 #include	<freeradius-devel/libradius.h>
 
 #include	<freeradius-devel/md5.h>
-#include	<freeradius-devel/rfc4849.h>
+// #include	<freeradius-devel/rfc4849.h>
 
 #include	<fcntl.h>
 #include	<ctype.h>
@@ -1578,7 +1578,7 @@ int rad_vp2rfc(RADIUS_PACKET const *packet,
 
 	VERIFY_VP(vp);
 
-	if (room < 2) return -1;
+	// if (room < 2) return -1;
 
 	if (vp->da->vendor != 0) {
 		fr_strerror_printf("rad_vp2rfc called with VSA");
@@ -1638,81 +1638,81 @@ int rad_vp2rfc(RADIUS_PACKET const *packet,
 	 *	decoder to do the opposite transformation on incoming
 	 *	packets.
 	 */
-	if (vp->da->attr == PW_NAS_FILTER_RULE) {
-		uint8_t const *end = ptr + room;
-		uint8_t *p, *attr = ptr;
-		bool zero = false;
+	// if (vp->da->attr == PW_NAS_FILTER_RULE) {
+	// 	uint8_t const *end = ptr + room;
+	// 	uint8_t *p, *attr = ptr;
+	// 	bool zero = false;
 
-		attr[0] = PW_NAS_FILTER_RULE;
-		attr[1] = 2;
-		p = ptr + 2;
+	// 	attr[0] = PW_NAS_FILTER_RULE;
+	// 	attr[1] = 2;
+	// 	p = ptr + 2;
 
-		while (vp && !vp->da->vendor && (vp->da->attr == PW_NAS_FILTER_RULE)) {
-			if ((p + zero + vp->vp_length) > end) {				
-				break;
-			}
+	// 	while (vp && !vp->da->vendor && (vp->da->attr == PW_NAS_FILTER_RULE)) {
+	// 		if ((p + zero + vp->vp_length) > end) {
+	// 			break;
+	// 		}
 
-			if (zero) {
-				if (attr[1] == 255) {
-					attr = p;
-					if ((attr + 3) >= end) break;
+	// 		if (zero) {
+	// 			if (attr[1] == 255) {
+	// 				attr = p;
+	// 				if ((attr + 3) >= end) break;
 
-					attr[0] = PW_NAS_FILTER_RULE;
-					attr[1] = 2;
-					p = attr + 2;
-				}
+	// 				attr[0] = PW_NAS_FILTER_RULE;
+	// 				attr[1] = 2;
+	// 				p = attr + 2;
+	// 			}
 
-				*(p++) = 0;
-				attr[1]++;
-			}
+	// 			*(p++) = 0;
+	// 			attr[1]++;
+	// 		}
 
-			/*
-			 *	Check for overflow
-			 */
-			if ((attr[1] + vp->vp_length) < 255) {
-				memcpy(p, vp->vp_strvalue, vp->vp_length);
-				attr[1] += vp->vp_length;
-				p += vp->vp_length;
+	// 		/*
+	// 		 *	Check for overflow
+	// 		 */
+	// 		if ((attr[1] + vp->vp_length) < 255) {
+	// 			memcpy(p, vp->vp_strvalue, vp->vp_length);
+	// 			attr[1] += vp->vp_length;
+	// 			p += vp->vp_length;
 
-			} else if (attr + (attr[1] + 2 + vp->vp_length) > end) {
-				break;
+	// 		} else if (attr + (attr[1] + 2 + vp->vp_length) > end) {
+	// 			break;
 
-			} else if (vp->vp_length > 253) {
-				/*
-				 *	Drop VPs which are too long.
-				 *	We don't (yet) split one VP
-				 *	across multiple attributes.
-				 */
-				vp = vp->next;
-				continue;
+	// 		} else if (vp->vp_length > 253) {
+	// 			/*
+	// 			 *	Drop VPs which are too long.
+	// 			 *	We don't (yet) split one VP
+	// 			 *	across multiple attributes.
+	// 			 */
+	// 			vp = vp->next;
+	// 			continue;
 
-			} else {
-				size_t first, second;
+	// 		} else {
+	// 			size_t first, second;
 
-				first = 255 - attr[1];
-				second = vp->vp_length - first;
+	// 			first = 255 - attr[1];
+	// 			second = vp->vp_length - first;
 
-				memcpy(p, vp->vp_strvalue, first);
-				p += first;
-				attr[1] = 255;
-				attr = p;
+	// 			memcpy(p, vp->vp_strvalue, first);
+	// 			p += first;
+	// 			attr[1] = 255;
+	// 			attr = p;
 
-				attr[0] = PW_NAS_FILTER_RULE;
-				attr[1] = 2;
-				p = attr + 2;
+	// 			attr[0] = PW_NAS_FILTER_RULE;
+	// 			attr[1] = 2;
+	// 			p = attr + 2;
 
-				memcpy(p, vp->vp_strvalue + first, second);
-				attr[1] += second;
-				p += second;
-			}
+	// 			memcpy(p, vp->vp_strvalue + first, second);
+	// 			attr[1] += second;
+	// 			p += second;
+	// 		}
 
-			vp = vp->next;
-			zero = true;
-		}
+	// 		vp = vp->next;
+	// 		zero = true;
+	// 	}
 
-		*pvp = vp;
-		return p - ptr;
-	}
+	// 	*pvp = vp;
+	// 	return p - ptr;
+	// }
 
 	/*
 	 *	EAP-Message is special.
@@ -3301,7 +3301,7 @@ static ssize_t data2vp_nas_filter_rule(TALLOC_CTX *ctx,
 		fr_strerror_printf("decode NAS-Filter-Rule: Out of memory");
 		return -1;
 	}
-				
+
 	fr_pair_value_bstrncpy(vp, buffer, q - buffer);
 
 	*pvp = vp;
@@ -3708,7 +3708,7 @@ static ssize_t data2vp_wimax(TALLOC_CTX *ctx,
 	 *	+ continuation, it's a bad attribute.
 	 */
 	if (attrlen < 8) {
-	raw:		
+	raw:
 		/*
 		 *	It's not a Vendor-Specific, it's unknown...
 		 */
